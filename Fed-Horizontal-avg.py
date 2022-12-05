@@ -45,7 +45,7 @@ if __name__ == "__main__":
     
 
     # Read config file and append configs to args parser
-    df = pd.read_csv('./all_runs_config.csv')
+    df = pd.read_csv('./all_runs_config.csv', nrows= 10)
     iid_filter = (df['partition_method'] == 0.0)
     non_iid_filter = (df['partition_method'] == 1.0)
     df.loc[iid_filter, 'partition_method'] = 'iid'
@@ -54,12 +54,12 @@ if __name__ == "__main__":
     partition_method, partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, comm_round = list(df.iloc[args.config_id])
     args.partition_method = partition_method
     args.partition_alpha = partition_alpha
-    args.batch_size = int(batch_size)
-    args.lr = lr
-    args.wd = wd
-    args.epochs = int(epochs)
-    args.client_num_in_total = int(client_num_in_total)
-    args.comm_round = int(comm_round)
+    #args.batch_size = int(batch_size)
+    #args.lr = lr
+    #args.wd = wd
+    #args.epochs = int(epochs)
+    #args.client_num_in_total = int(client_num_in_total)
+    #args.comm_round = int(comm_round)
     logger.info(args)
 
     device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")

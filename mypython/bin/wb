@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/vol/home/s2362864/Desktop/uni/3de jaar 1e semester/BP/fed_benchmarks/mypython/bin/python2" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from wandb.cli.cli import cli
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(cli())
