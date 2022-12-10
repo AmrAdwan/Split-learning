@@ -1,0 +1,204 @@
+{
+    "os": "Linux-4.15.0-194-generic-x86_64-with-Ubuntu-18.04-bionic",
+    "python": "3.6.9",
+    "heartbeatAt": "2022-11-20T14:17:45.756475",
+    "startedAt": "2022-11-20T14:17:44.954810",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--partition_method",
+        "iid",
+        "--comm_round",
+        "50",
+        "--gpu",
+        "0"
+    ],
+    "state": "running",
+    "program": "Fed-Horizontal-avg.py",
+    "codePath": "Fed-Horizontal-avg.py",
+    "git": {
+        "remote": "git@github.com:AmrAdwan/fed_benchmarks.git",
+        "commit": "b7e6f72357c24157a7b431b7bcd8d340db3da6e7"
+    },
+    "email": null,
+    "root": "/vol/home/s2362864/Desktop/uni/3de jaar 1e semester/BP/fed_benchmarks",
+    "host": "huisuil01.vuw.leidenuniv.nl",
+    "username": "s2362864",
+    "executable": "/vol/home/s2362864/Desktop/uni/3de jaar 1e semester/BP/fed_benchmarks/.venv/bin/python",
+    "cpu_count": 16,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 1845.4419999999996,
+        "min": 1200.0,
+        "max": 4000.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1373.877,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1408.325,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1410.701,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1397.603,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1397.662,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1398.591,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1401.389,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1418.161,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2717.015,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2651.36,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2654.095,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2639.548,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2687.998,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2531.012,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2653.705,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 2648.43,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1405.608,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1407.762,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1409.064,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1396.656,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1396.578,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1395.67,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1393.231,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1200.135,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1406.009,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1508.91,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1516.011,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1491.416,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1463.77,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1582.736,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1459.708,
+            "min": 1200.0,
+            "max": 4000.0
+        },
+        {
+            "current": 1462.545,
+            "min": 1200.0,
+            "max": 4000.0
+        }
+    ],
+    "disk": {
+        "total": 45.65530776977539,
+        "used": 20.817665100097656
+    },
+    "memory": {
+        "total": 47.1190299987793
+    }
+}
