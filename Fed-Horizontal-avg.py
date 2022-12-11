@@ -54,12 +54,12 @@ if __name__ == "__main__":
     partition_method, partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, comm_round = list(df.iloc[args.config_id])
     args.partition_method = partition_method
     args.partition_alpha = partition_alpha
-    #args.batch_size = int(batch_size)
-    #args.lr = lr
-    #args.wd = wd
-    #args.epochs = int(epochs)
-    #args.client_num_in_total = int(client_num_in_total)
-    #args.comm_round = int(comm_round)
+    args.batch_size = int(batch_size)
+    args.lr = lr
+    args.wd = wd
+    args.epochs = int(epochs)
+    args.client_num_in_total = int(client_num_in_total)
+    args.comm_round = int(comm_round)
     logger.info(args)
 
     device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
