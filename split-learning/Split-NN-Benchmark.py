@@ -140,12 +140,12 @@ if __name__ == "__main__":
     args.config_id = config_id
     args.partition_alpha = partition_alpha
     args.batch_size = int(batch_size)
-    # args.lr = lr
-    args.lr = 0.5
+    args.lr = lr
     args.wd = wd
     args.epochs = int(epochs)
     args.client_num_in_total = int(client_num_in_total)
-    args.cut_layer = int(cut_layer)
+    # args.cut_layer = int(cut_layer)
+    args.cut_layer = 10
     args.num_ln = int(num_ln)
     args.random_seed = int(random_seed)
     num_clients = args.client_num_in_total
