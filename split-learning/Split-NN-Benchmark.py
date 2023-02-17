@@ -140,7 +140,8 @@ if __name__ == "__main__":
     args.config_id = config_id
     args.partition_alpha = partition_alpha
     args.batch_size = int(batch_size)
-    args.lr = lr
+    # args.lr = lr
+    args.lr = 0.5
     args.wd = wd
     args.epochs = int(epochs)
     args.client_num_in_total = int(client_num_in_total)
@@ -403,5 +404,5 @@ if __name__ == "__main__":
         accuracy = check_accuracy(clients, test_dataloader, server_model)
         wandb.log({"Test/Acc": accuracy, "epoch": epoch})
         wandb.log({"Train/Loss": loss.item(), "epoch": epoch})
-        print("Epoch: {}, Accuracy: {} ".format(epoch, accuracy), end="")
+        print("Epoch: {}, Accuracy: {} ".format(epoch, accuracy), end="\n")
 
