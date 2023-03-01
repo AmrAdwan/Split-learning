@@ -152,7 +152,7 @@ if __name__ == "__main__":
     args.wd = 0.5
     args.epochs = 15
     # args.client_num_in_total = 100
-    args.cut_layer = 40
+    args.cut_layer = 15
 
 
     args.num_ln = int(num_ln)
