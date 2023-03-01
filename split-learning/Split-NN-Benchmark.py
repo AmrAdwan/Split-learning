@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # args.lr = lr
     # args.wd = wd
     # args.epochs = int(epochs)
-    # args.client_num_in_total = int(client_num_in_total)
+    args.client_num_in_total = int(client_num_in_total)
     # args.cut_layer = 10
 
     args.partition_alpha = 0.01
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     args.lr = 0.01
     args.wd = 0.1
     args.epochs = 30
-    args.client_num_in_total = 100
+    # args.client_num_in_total = 100
     args.cut_layer = 10
 
 
