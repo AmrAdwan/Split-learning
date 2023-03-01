@@ -138,14 +138,23 @@ if __name__ == "__main__":
 
     partition_alpha,batch_size,lr,wd,epochs,client_num_in_total,cut_layer,num_ln,agg_type,ln_upscale,random_seed,db_id,config_id = list(df.iloc[args.config_id])
     args.config_id = config_id
-    args.partition_alpha = partition_alpha
-    args.batch_size = int(batch_size)
-    args.lr = lr
-    args.wd = wd
-    args.epochs = int(epochs)
-    args.client_num_in_total = int(client_num_in_total)
-    # args.cut_layer = int(cut_layer)
+    # args.partition_alpha = partition_alpha
+    # args.batch_size = int(batch_size)
+    # args.lr = lr
+    # args.wd = wd
+    # args.epochs = int(epochs)
+    # args.client_num_in_total = int(client_num_in_total)
+    # args.cut_layer = 10
+
+    args.partition_alpha = 0.01
+    args.batch_size = 10
+    args.lr = 0.01
+    args.wd = 0.1
+    args.epochs = 30
+    args.client_num_in_total = 100
     args.cut_layer = 10
+
+
     args.num_ln = int(num_ln)
     args.random_seed = int(random_seed)
     num_clients = args.client_num_in_total
