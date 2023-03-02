@@ -147,12 +147,12 @@ if __name__ == "__main__":
     # args.cut_layer = 10
 
     args.partition_alpha = 10
-    args.batch_size = 64
-    args.lr = 0.025
-    args.wd = 0.025
+    args.batch_size = 128
+    args.lr = 0.005
+    args.wd = 0.005
     args.epochs = 10
     # args.client_num_in_total = 100
-    args.cut_layer = 10
+    args.cut_layer = 15
 
 
     args.num_ln = int(num_ln)
