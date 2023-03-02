@@ -146,13 +146,13 @@ if __name__ == "__main__":
     args.client_num_in_total = int(client_num_in_total)
     # args.cut_layer = 10
 
-    args.partition_alpha = 10
-    args.batch_size = 128
-    args.lr = 0.005
-    args.wd = 0.005
+    args.partition_alpha = 5
+    args.batch_size = 256
+    args.lr = 0.001
+    args.wd = 0.001
     args.epochs = 10
     # args.client_num_in_total = 100
-    args.cut_layer = 15
+    args.cut_layer = 20
 
 
     args.num_ln = int(num_ln)
