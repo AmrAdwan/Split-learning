@@ -1,0 +1,16 @@
+{
+    "os": "Linux-5.4.0-1043-gcp-x86_64-with-glibc2.10",
+    "python": "3.8.8",
+    "heartbeatAt": "2021-05-24T09:37:55.100722",
+    "startedAt": "2021-05-24T09:37:54.307585",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": "10.1.243",
+    "args": [],
+    "state": "running",
+    "program": "Fed-Horizontal-avg.py",
+    "codePath": "Fed-Horizontal-avg.py",
+    "host": "develop",
+    "username": "aminmoradi",
+    "executable": "/home/aminmoradi/miniconda3/envs/pysyft2/bin/python"
+}

@@ -1,0 +1,22 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-12-21T21:56:41.269350",
+    "startedAt": "2022-12-21T21:56:40.460521",
+    "docker": null,
+    "cpu_count": 4,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "Fed-Horizontal-avg.py",
+    "codePath": "Fed-Horizontal-avg.py",
+    "git": {
+        "remote": "git@github.com:AmrAdwan/fed_benchmarks.git",
+        "commit": "4044a434f0512d017c0281ab02cc3f07328c38f2"
+    },
+    "email": "a.adwan@umail.leidenuniv.nl",
+    "root": "/Users/amradwan/Desktop/uni/3ejaar/3de jaar 1e semester/bachelor_project/fed_benchmarks",
+    "host": "MBP-van-Amr.home",
+    "username": "amradwan",
+    "executable": "/Users/amradwan/opt/anaconda3/bin/python"
+}

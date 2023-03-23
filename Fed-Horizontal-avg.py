@@ -30,7 +30,7 @@ import wandb
 # import concurrent.futures
 from args_parser import add_args
 from data_preprocessing.data_loader import load_data
-from models.resnet import resnet56, resnet18
+from models.resnet import resnet110, resnet56, resnet18
 from models.trainer import ClassificationModelTrainer
 from FedAvgApi import FedAvgAPI
 
@@ -81,8 +81,9 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
 
     dataset = load_data(args, args.dataset)
-    # model = resnet56(class_num=dataset[7])
-    model = resnet18(class_num=dataset[7])
+    model = resnet56(class_num=dataset[7])
+    # model = resnet18(class_num=dataset[7])
+    # model = resnet110(class_num = dataset[7])
     
     
     model_trainer = ClassificationModelTrainer(model) 
