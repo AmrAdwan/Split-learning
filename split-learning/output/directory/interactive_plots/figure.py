@@ -82,7 +82,7 @@ class CustomToolbar(NavigationToolbar2Tk):
         self.parent = parent
 
 
-# Load the .fig.pkl file
+# Load the .fig.pkl files
 file_path1 = 'batch_size_client_num_in_total.fig.pkl'
 with open(file_path1, 'rb') as f:
     print(matplotlib.get_backend())
@@ -95,6 +95,21 @@ with open(file_path2, 'rb') as f:
 
 file_path3 = 'client_num_in_total_cut_layer.fig.pkl'
 with open(file_path3, 'rb') as f:
+    print(matplotlib.get_backend())
+    fig = pickle.load(f)
+
+file_path4 = 'batch_size_partition_alpha.fig.pkl'
+with open(file_path4, 'rb') as f:
+    print(matplotlib.get_backend())
+    fig = pickle.load(f)
+
+file_path5 = 'cut_layer_partition_alpha.fig.pkl'
+with open(file_path5, 'rb') as f:
+    print(matplotlib.get_backend())
+    fig = pickle.load(f)
+
+file_path6 = 'client_num_in_total_partition_alpha.fig.pkl'
+with open(file_path6, 'rb') as f:
     print(matplotlib.get_backend())
     fig = pickle.load(f)
 

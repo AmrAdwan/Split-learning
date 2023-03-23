@@ -147,7 +147,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # # Read config file and append configs to args parser
-    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A22.csv')
+    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A20.csv')
+    # df = pd.read_csv('./run-configs/small_batch_split_nn_all_runs_config.csv')
 
 
 
@@ -263,7 +264,7 @@ if __name__ == "__main__":
 
 
     # // this works so far
-    column_names = ['batch_size', 'client_num_in_total', 'cut_layer']
+    column_names = ['partition_alpha', 'batch_size', 'client_num_in_total', 'cut_layer']
     X = df.loc[:, column_names]
     last_column_name = df.columns[-1]
     y = df.loc[:, last_column_name]
@@ -275,13 +276,22 @@ if __name__ == "__main__":
 
     cs = ConfigurationSpace()
 
+    pa_min = df['partition_alpha'].min()
+    pa_max = df['partition_alpha'].max()
+
+    partition_alpha = UniformFloatHyperparameter("partition_alpha", pa_min, pa_max, default_value=args.partition_alpha)
     batch_size = UniformIntegerHyperparameter("batch_size", 8, 128, default_value=args.batch_size)
     client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", 1, 19, default_value=args.client_num_in_total)
     cut_layer = UniformIntegerHyperparameter("cut_layer", 2, 9, default_value=args.cut_layer)
 
-    cs.add_hyperparameters([batch_size, client_num_in_total, cut_layer])
+    cs.add_hyperparameters([partition_alpha, batch_size, client_num_in_total, cut_layer])
 
     # f = fANOVA(X_train.to_numpy(), y_train.to_numpy(), config_space=cs)
+
+    # Reorder the columns in X_train to match the order of hyperparameters in the configuration space
+    ordered_hyperparameters = [hp.name for hp in cs.get_hyperparameters()]
+    X_train = X_train[ordered_hyperparameters]
+
 
     
     f = fANOVA(X_train.to_numpy(), y_train_normalized, config_space=cs)
