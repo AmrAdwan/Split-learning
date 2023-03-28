@@ -1,3 +1,4 @@
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import torch
 
@@ -43,6 +44,33 @@ from ConfigSpace.hyperparameters import UniformFloatHyperparameter, CategoricalH
 from ConfigSpace.configuration_space import Configuration
 from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparameter, Constant, OrdinalHyperparameter, \
     NumericalHyperparameter
+
+
+
+def save_accuracy_to_csv(accuracy, file_path='./run-configs/accuracy_values.csv'):
+    # Check if the CSV file exists
+    if os.path.exists(file_path):
+        # If the file exists, read the existing data from the file
+        existing_data = pd.read_csv(file_path)
+        
+        # Append the new data to the existing data
+        new_data = pd.DataFrame({'accuracy': [accuracy]})
+        combined_data = existing_data.append(new_data, ignore_index=True)
+    else:
+        # If the file does not exist, create a new DataFrame with the new data
+        combined_data = pd.DataFrame({'accuracy': [accuracy]})
+
+    # Save the DataFrame to the CSV file
+    combined_data.to_csv(file_path, index=False)
+
+
+
+
+
+
+
+
+
 
 # num_features, datasetid
 cc18 = [
@@ -118,7 +146,7 @@ def partition_data(n_feature, n_nets, alpha, columns):
             res[res.argmax()] -= 1
             res[i] += 1
     final_res = []
-    print(res)
+    # print(res)
     cols = np.array(columns)
     for i in res:
         if len(cols) == 0:
@@ -147,32 +175,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # # Read config file and append configs to args parser
-    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A20.csv')
+    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A23.csv')
     # df = pd.read_csv('./run-configs/small_batch_split_nn_all_runs_config.csv')
-
-
-
-    # # X_full = np.loadtxt('./run-configs/SL_ALL_VARIENT_A22.csv', delimiter=',', skiprows=1)
-    # # y_full = np.loadtxt('./run-configs/SL_ALL_VARIENT_A22.csv', delimiter=',', skiprows=1)
-    # X_full = np.loadtxt('../fanova/examples/example_data/online_lda/online_lda_responses.csv', delimiter=',')
-    # y_full = np.loadtxt('../fanova/examples/example_data/online_lda/online_lda_responses.csv', delimiter=',')
-
-    # n_samples = X_full.shape[0]//2
-    # # n_samples = 128
-
-    # indices = np.random.choice(X_full.shape[0], n_samples)
-
-    # if n_samples < X_full.shape[0]:
-    #     X=X_full[indices]
-    #     y=y_full[indices]
-    # else:
-    #     X=X_full
-    #     y=y_full
-
-    
-    # # note that one can specify a ConfigSpace here, but if none is provided, all variables are
-    # # assumed to be continuous and the range is (min,max)
-    # f = fanova.fANOVA(X,y,  n_trees=32,bootstrapping=True)
 
     
     partition_alpha,batch_size,lr,wd,epochs,client_num_in_total,cut_layer,num_ln,agg_type,ln_upscale,random_seed,db_id,config_id = list(df.iloc[args.config_id])
@@ -207,45 +211,45 @@ if __name__ == "__main__":
     dataset_index_id = args.dataset_index_id
     (_, dataset_id) = cc18[dataset_index_id]
     args.dataset_id = dataset_id
-    print(" dataset_id ", dataset_id)
+    # print(" dataset_id ", dataset_id)
 
+
+
+    # // this works so far
+    # print(df.head(5))
 
     # column_names = ['partition_alpha', 'batch_size', 'client_num_in_total', 'cut_layer']
     # X = df.loc[:, column_names]
     # last_column_name = df.columns[-1]
-    # y = df.loc[:, last_column_name]  # selecting the target column assuming it is the last one
-
+    # y = df.loc[:, last_column_name]
 
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    # # Create a configuration space
+    
+    # scaler = MinMaxScaler()
+    # y_train_normalized = scaler.fit_transform(y_train.to_numpy().reshape(-1, 1)).reshape(-1)
+
     # cs = ConfigurationSpace()
 
-    # # Add hyperparameters to the configuration space
-    # partition_alpha = UniformFloatHyperparameter("partition_alpha", 0.0, 20.0, default_value=args.partition_alpha)
-    # batch_size = UniformIntegerHyperparameter("batch_size", 32, 512, default_value=args.batch_size)
-    # # lr = UniformFloatHyperparameter("lr", 0.01, 0.01, default_value=args.lr)
-    # # wd = UniformFloatHyperparameter("wd", 0.01, 0.01, default_value=args.wd)
-    # # epochs = UniformIntegerHyperparameter("epochs", 15, 15, default_value=args.epochs)
-    # client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", 1, 20, default_value=args.client_num_in_total)
-    # cut_layer = UniformIntegerHyperparameter("cut_layer", 1, 10, default_value=args.cut_layer)
-    # # num_ln = UniformIntegerHyperparameter("num_ln", 10, 10, default_value=args.num_ln)
-    # # agg_type = CategoricalHyperparameter("agg_type", ['stack', 'average'], default_value=args.agg_type)
-    # # ln_upscale = UniformIntegerHyperparameter("ln_upscale", 1, 1000, default_value=args.ln_upscale)
+    # pa_min = df['partition_alpha'].min()
+    # pa_max = df['partition_alpha'].max()
+
+    # partition_alpha = UniformFloatHyperparameter("partition_alpha", pa_min, pa_max, log=True, default_value=args.partition_alpha)
+    # batch_size = UniformIntegerHyperparameter("batch_size", 8, 128, default_value=args.batch_size)
+    # client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", 1, 19, default_value=args.client_num_in_total)
+    # cut_layer = UniformIntegerHyperparameter("cut_layer", 2, 9, default_value=args.cut_layer)
 
     # cs.add_hyperparameters([partition_alpha, batch_size, client_num_in_total, cut_layer])
-    # # agg_type_default = 'stack' if int(agg_type) == 0 else 'average'
-    # # agg_type = CategoricalHyperparameter("agg_type", ['stack', 'average'], default_value=agg_type_default)
+
+    # # f = fANOVA(X_train.to_numpy(), y_train.to_numpy(), config_space=cs)
+
+    # # Reorder the columns in X_train to match the order of hyperparameters in the configuration space
+    # ordered_hyperparameters = [hp.name for hp in cs.get_hyperparameters()]
+    # X_train = X_train[ordered_hyperparameters]
 
 
+    
+    # f = fANOVA(X_train.to_numpy(), y_train_normalized, config_space=cs)
 
-    # # Instantiate fANOVA with the configuration space and data
-    # # f = fANOVA(X_train.values, y_train.values, config_space=cs)
-    # # f = fANOVA(X_train.values, y_train.values)
-
-    # for col_name in column_names:
-    #     print(f"{col_name} min: {X_train[col_name].min()}, max: {X_train[col_name].max()}")
-
-    # f = fANOVA(X_train, y_train, config_space=cs)
 
 
     # importances = {}
@@ -254,69 +258,16 @@ if __name__ == "__main__":
     #     importance = f.quantify_importance((i,))
     #     importances[feature] = importance[(i,)]['total importance']
 
-    # print("Feature importances:")
+    # # print("Feature importances:")
     # for feature, importance in importances.items():
     #     print(f"Feature {feature}: {importance}")
 
-    # vis = visualizer.Visualizer(f, X_train.columns.tolist(), './output/directory/')
+    # output_dir = './output/directory/'
+    # os.makedirs(output_dir, exist_ok=True)
+    # constant = [0,1]
+    # vis = visualizer.Visualizer(f, cs, output_dir)
+    # # vis = CustomVisualizer(f, cs, output_dir)
     # vis.create_all_plots()
-
-
-
-    # // this works so far
-    column_names = ['partition_alpha', 'batch_size', 'client_num_in_total', 'cut_layer']
-    X = df.loc[:, column_names]
-    last_column_name = df.columns[-1]
-    y = df.loc[:, last_column_name]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    
-    scaler = MinMaxScaler()
-    y_train_normalized = scaler.fit_transform(y_train.to_numpy().reshape(-1, 1)).reshape(-1)
-
-    cs = ConfigurationSpace()
-
-    pa_min = df['partition_alpha'].min()
-    pa_max = df['partition_alpha'].max()
-
-    partition_alpha = UniformFloatHyperparameter("partition_alpha", pa_min, pa_max, default_value=args.partition_alpha)
-    batch_size = UniformIntegerHyperparameter("batch_size", 8, 128, default_value=args.batch_size)
-    client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", 1, 19, default_value=args.client_num_in_total)
-    cut_layer = UniformIntegerHyperparameter("cut_layer", 2, 9, default_value=args.cut_layer)
-
-    cs.add_hyperparameters([partition_alpha, batch_size, client_num_in_total, cut_layer])
-
-    # f = fANOVA(X_train.to_numpy(), y_train.to_numpy(), config_space=cs)
-
-    # Reorder the columns in X_train to match the order of hyperparameters in the configuration space
-    ordered_hyperparameters = [hp.name for hp in cs.get_hyperparameters()]
-    X_train = X_train[ordered_hyperparameters]
-
-
-    
-    f = fANOVA(X_train.to_numpy(), y_train_normalized, config_space=cs)
-
-
-
-    importances = {}
-
-    for i, feature in enumerate(column_names):
-        importance = f.quantify_importance((i,))
-        importances[feature] = importance[(i,)]['total importance']
-
-    print("Feature importances:")
-    for feature, importance in importances.items():
-        print(f"Feature {feature}: {importance}")
-
-    output_dir = './output/directory/'
-    os.makedirs(output_dir, exist_ok=True)
-    constant = [0,1]
-    vis = visualizer.Visualizer(f, cs, output_dir)
-    # vis = CustomVisualizer(f, cs, output_dir)
-    vis.create_all_plots()
-
-
-
 
 
 
@@ -360,6 +311,7 @@ if __name__ == "__main__":
     ignore_attributes = openml_dataset.ignore_attribute or []
     id_index_attribute = openml_dataset.row_id_attribute
     feature_obj = openml_dataset.features
+    # print(feature_obj)
 
     ignore_categorical = [id_index_attribute] + ignore_attributes
     categorical_features = [feature.name for _, feature in feature_obj.items() if feature.data_type == 'nominal' and feature.name not in ignore_categorical]
@@ -376,7 +328,7 @@ if __name__ == "__main__":
 
     for drop_col in ignore_categorical:
         if drop_col in columns:
-            print('Droping: ', drop_col)
+            # print('Droping: ', drop_col)
             df.drop(columns=[drop_col], inplace=True)
             columns = list(df.columns)
 
@@ -393,6 +345,7 @@ if __name__ == "__main__":
     df = sklearn.utils.shuffle(df)
     df_test = df.iloc[:math.floor(n_train_samples * 0.2)]
     df = df.iloc[math.floor(n_train_samples * 0.2):]
+
 
     n_train_samples, n_features = df.shape
     n_test_samples, _ = df_test.shape
@@ -437,7 +390,7 @@ if __name__ == "__main__":
 
         dataset = TabularDataset(data=raw_df, cat_cols=cat_cols, is_client=True)
 
-    #     # Using complete_df here bacause we must set emb layer for all types of a feature.     
+        # Using complete_df here bacause we must set emb layer for all types of a feature.     
         cat_dims = [int(complete_df[col].nunique()) for col in cat_cols]
         emb_dims = [(x, min(50, (x + 1) // 2)) for x in cat_dims]
 
@@ -559,11 +512,13 @@ if __name__ == "__main__":
                     activation.backward(server_inputs.grad)
                 prev_pointer += nn_partition
                 client.get('optimizer').step()
+        
                 
-            # print("\r Epoch: {} , Loss {}".format(epoch, loss.item()), end="")
-            # Calculate test accuracy after each epoch
+        # print("\r Epoch: {} , Loss {}".format(epoch, loss.item()), end="")
+        # Calculate test accuracy after each epoch
         accuracy = check_accuracy(clients, test_dataloader, server_model)
+
         wandb.log({"Test/Acc": accuracy, "epoch": epoch})
         wandb.log({"Train/Loss": loss.item(), "epoch": epoch})
         print("Epoch: {}, Accuracy: {} ".format(epoch, accuracy), end="\n")
-
+        save_accuracy_to_csv(accuracy)
