@@ -1,3 +1,4 @@
+import csv
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import torch
@@ -46,29 +47,33 @@ from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparamete
     NumericalHyperparameter
 
 
+# def save_accuracy_to_csv(accuracy, file_path='./run-configs/accuracy_values.csv'):
+#     # Check if the CSV file exists
+#     if os.path.exists(file_path):
+#         # If the file exists, read the existing data from the file
+#         existing_data = pd.read_csv(file_path)
 
-def save_accuracy_to_csv(accuracy, file_path='./run-configs/accuracy_values.csv'):
-    # Check if the CSV file exists
-    if os.path.exists(file_path):
-        # If the file exists, read the existing data from the file
-        existing_data = pd.read_csv(file_path)
-        
-        # Append the new data to the existing data
-        new_data = pd.DataFrame({'accuracy': [accuracy]})
-        combined_data = existing_data.append(new_data, ignore_index=True)
-    else:
-        # If the file does not exist, create a new DataFrame with the new data
-        combined_data = pd.DataFrame({'accuracy': [accuracy]})
+#         # Append the new data to the existing data
+#         new_data = pd.DataFrame({'accuracy': [accuracy]})
+#         combined_data = existing_data.append(new_data, ignore_index=True)
+#     else:
+#         # If the file does not exist, create a new DataFrame with the new data
+#         combined_data = pd.DataFrame({'accuracy': [accuracy]})
 
-    # Save the DataFrame to the CSV file
-    combined_data.to_csv(file_path, index=False)
+#     # Save the DataFrame to the CSV file
+#     combined_data.to_csv(file_path, index=False)
 
+def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values.csv"):
+    # Add column names if file is empty
+    if os.path.isfile(csv_file) and os.path.getsize(csv_file) == 0:
+        with open(csv_file, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(list(hyperparameters.keys()) + ['accuracy'])
 
-
-
-
-
-
+    # Append accuracy and hyperparameters to CSV file
+    with open(csv_file, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow( [hyperparameters[key] for key in sorted(hyperparameters)] + [accuracy])
 
 
 
@@ -86,7 +91,9 @@ cc18 = [
     # (73, 1487),
     (65, 28),
     (62, 46)
- ]
+]
+
+
 def check_accuracy(clients, test_dataloader, server_model):
     with torch.no_grad():
         num_correct = 0
@@ -103,7 +110,7 @@ def check_accuracy(clients, test_dataloader, server_model):
 
         for y, cont_x, cat_x in test_dataloader:
             inference_output = []
-            y  = y.to(device)
+            y = y.to(device)
             for loader, model in zip(all_test_dataloader, all_client_models):
                 cont_x, cat_x = next(loader)
                 cat_x = cat_x.to(device)
@@ -111,26 +118,27 @@ def check_accuracy(clients, test_dataloader, server_model):
                 activation = model(cont_x, cat_x)
                 inference_output.append(activation)
 
-
-
-
             if(server_nn_type == 'stack'):
-                server_input = torch.cat(inference_output, dim=1).detach().clone()
+                server_input = torch.cat(
+                    inference_output, dim=1).detach().clone()
             else:
-                server_input = torch.mean(torch.stack(inference_output), dim=0).detach().clone()
-                
+                server_input = torch.mean(torch.stack(
+                    inference_output), dim=0).detach().clone()
+
             server_input = Variable(server_input, requires_grad=False)
             outputs = server_model(server_input)
 
             predictions = outputs.max(1)[1]
-            y = y.reshape(1,-1)[0].type(torch.long)
+            y = y.reshape(1, -1)[0].type(torch.long)
             num_correct += (predictions == y).sum()
             num_samples += predictions.size(0)
-        print('Acc:: ',float(num_correct)/float(num_samples))
+        print('Acc:: ', float(num_correct)/float(num_samples))
         return float(num_correct)/float(num_samples)
+
 
 def remove_from_array(arr, items):
     return [item for item in arr if item not in items]
+
 
 def partition_data(n_feature, n_nets, alpha, columns):
     n_feature = n_feature
@@ -138,7 +146,7 @@ def partition_data(n_feature, n_nets, alpha, columns):
     proportions = np.random.dirichlet(np.repeat(alpha, n_nets))
 
     res = np.array([int(p * n_feature) for p in proportions])
-    
+
     while res.sum() != n_feature:
         res[res.argmin()] += 1
     for i, part in enumerate(res):
@@ -154,17 +162,20 @@ def partition_data(n_feature, n_nets, alpha, columns):
         batched = random.sample(list(cols), i)
         final_res.append(batched)
         cols = remove_from_array(cols, batched)
-    return final_res  
+    return final_res
 
 
-def distribute_features(dataframe, num_clients, alpha, ignore_columns = []):
-    
-    features = list(filter(lambda x: x not in ignore_columns, list(dataframe.columns)))
-    clients_columns = partition_data(len(features), num_clients, alpha, features)
+def distribute_features(dataframe, num_clients, alpha, ignore_columns=[]):
+
+    features = list(
+        filter(lambda x: x not in ignore_columns, list(dataframe.columns)))
+    clients_columns = partition_data(
+        len(features), num_clients, alpha, features)
     dfs = []
-    for selected_columns in clients_columns:        
+    for selected_columns in clients_columns:
         dfs.append(dataframe[list(selected_columns)])
     return dfs
+
 
 if __name__ == "__main__":
     logging.basicConfig()
@@ -173,33 +184,22 @@ if __name__ == "__main__":
     torch.multiprocessing.set_start_method('spawn')
     parser = add_args(argparse.ArgumentParser(description='SplitLearning'))
     args = parser.parse_args()
-    
+
     # # Read config file and append configs to args parser
     df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A23.csv')
     # df = pd.read_csv('./run-configs/small_batch_split_nn_all_runs_config.csv')
 
-    
-    partition_alpha,batch_size,lr,wd,epochs,client_num_in_total,cut_layer,num_ln,agg_type,ln_upscale,random_seed,db_id,config_id = list(df.iloc[args.config_id])
+    partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, cut_layer, num_ln, agg_type, ln_upscale, random_seed, db_id, config_id = list(
+        df.iloc[args.config_id])
     args.config_id = config_id
     args.partition_alpha = partition_alpha
     args.batch_size = int(batch_size)
     args.lr = lr
     args.wd = wd
-    args.epochs = int(epochs)
+    # args.epochs = int(epochs)
+    args.epochs = 200
     args.client_num_in_total = int(client_num_in_total)
     args.cut_layer = cut_layer
-
-    # args.partition_alpha = 5
-    # args.batch_size = 256
-    # args.lr = 0.001
-    # args.wd = 0.001
-    # args.epochs = 10
-    # args.client_num_in_total = 100
-    # args.cut_layer = 20 
-
-
-    
-
     args.num_ln = int(num_ln)
     args.random_seed = int(random_seed)
     num_clients = args.client_num_in_total
@@ -213,18 +213,18 @@ if __name__ == "__main__":
     args.dataset_id = dataset_id
     # print(" dataset_id ", dataset_id)
 
-
-
     # // this works so far
     # print(df.head(5))
+
+    # df_acc = pd.read_csv("./run-configs/accuracy_values.csv")
 
     # column_names = ['partition_alpha', 'batch_size', 'client_num_in_total', 'cut_layer']
     # X = df.loc[:, column_names]
     # last_column_name = df.columns[-1]
-    # y = df.loc[:, last_column_name]
+    # y = df_acc.iloc[:, 0]
 
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    
+
     # scaler = MinMaxScaler()
     # y_train_normalized = scaler.fit_transform(y_train.to_numpy().reshape(-1, 1)).reshape(-1)
 
@@ -246,11 +246,7 @@ if __name__ == "__main__":
     # ordered_hyperparameters = [hp.name for hp in cs.get_hyperparameters()]
     # X_train = X_train[ordered_hyperparameters]
 
-
-    
     # f = fANOVA(X_train.to_numpy(), y_train_normalized, config_space=cs)
-
-
 
     # importances = {}
 
@@ -269,29 +265,26 @@ if __name__ == "__main__":
     # # vis = CustomVisualizer(f, cs, output_dir)
     # vis.create_all_plots()
 
-
-
     clients = {}
     batchsize = args.batch_size
-    config = { "cut_layer": args.cut_layer }
+    config = {"cut_layer": args.cut_layer}
 
     num_linear_layers = args.num_ln
     ln_upscale_ce = args.ln_upscale
     alpha = args.partition_alpha
-    
 
-    server_nn_type = args.agg_type #'stack' # stack, average
-
-
+    server_nn_type = args.agg_type  # 'stack' # stack, average
 
     logger.info(args)
 
-    device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:" + str(args.gpu)
+                          if torch.cuda.is_available() else "cpu")
     logger.info(device)
     print(' GPU =========================== ', torch.cuda.is_available())
     wandb.init(
         project="fedml",
-        name=args.run_name + '_Config_' + str(args.config_id) + '_DS_' + str(args.dataset_id) + '_Alice_22',
+        name=args.run_name + '_Config_' +
+        str(args.config_id) + '_DS_' + str(args.dataset_id) + '_Alice_22',
         config=args
     )
 
@@ -301,11 +294,10 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(args.random_seed)
     torch.backends.cudnn.deterministic = True
 
-
     openml_dataset = openml.datasets.get_dataset(
-        dataset_id, 
-        download_data=True # Do not download the dataset.
-        )
+        dataset_id,
+        download_data=True  # Do not download the dataset.
+    )
 
     target_label = openml_dataset.default_target_attribute
     ignore_attributes = openml_dataset.ignore_attribute or []
@@ -314,15 +306,16 @@ if __name__ == "__main__":
     # print(feature_obj)
 
     ignore_categorical = [id_index_attribute] + ignore_attributes
-    categorical_features = [feature.name for _, feature in feature_obj.items() if feature.data_type == 'nominal' and feature.name not in ignore_categorical]
-    numerical_features = [feature.name for _, feature in feature_obj.items() if feature.data_type == 'numeric' and feature.name not in ignore_categorical]
+    categorical_features = [feature.name for _, feature in feature_obj.items(
+    ) if feature.data_type == 'nominal' and feature.name not in ignore_categorical]
+    numerical_features = [feature.name for _, feature in feature_obj.items(
+    ) if feature.data_type == 'numeric' and feature.name not in ignore_categorical]
 
     categorical_features.append(target_label)
 
     # df = pd.read_csv('./40966.csv')
     df = openml_dataset.get_data()[0]
     complete_df = df.copy()
-
 
     columns = list(df.columns)
 
@@ -332,24 +325,21 @@ if __name__ == "__main__":
             df.drop(columns=[drop_col], inplace=True)
             columns = list(df.columns)
 
-
     # Load data and pre-clean
     df.replace("?", float("NaN"), inplace=True)
     df.dropna(axis=1, inplace=True)
     df.dropna(axis=0, inplace=True)
 
-
-    numerical_features = [col for col in numerical_features if col in df.columns]
+    numerical_features = [
+        col for col in numerical_features if col in df.columns]
 
     n_train_samples, n_features = df.shape
     df = sklearn.utils.shuffle(df)
     df_test = df.iloc[:math.floor(n_train_samples * 0.2)]
     df = df.iloc[math.floor(n_train_samples * 0.2):]
 
-
     n_train_samples, n_features = df.shape
     n_test_samples, _ = df_test.shape
-
 
     # Pre-proccess and initlize test and train datasets
     training_labels = df[target_label]
@@ -360,9 +350,9 @@ if __name__ == "__main__":
     testing_labels = LabelEncoder().fit_transform(testing_labels)
     testing_labels = torch.from_numpy(testing_labels).type(torch.long)
 
-
     df.drop(columns=[target_label], inplace=True)
-    distributed_dataframes = distribute_features(df, num_clients, alpha, ignore_categorical)
+    distributed_dataframes = distribute_features(
+        df, num_clients, alpha, ignore_categorical)
 
     n_output_classes = len(training_labels.unique())
 
@@ -371,31 +361,32 @@ if __name__ == "__main__":
     label_encoders = {}
     for cat_col in categorical_features:
         label_encoders[cat_col] = LabelEncoder()
-        df_test[cat_col] = label_encoders[cat_col].fit_transform(df_test[cat_col])
+        df_test[cat_col] = label_encoders[cat_col].fit_transform(
+            df_test[cat_col])
 
-
-    ## Setup client data and params
-
+    # Setup client data and params
 
     clients = {}
     for i, raw_df in enumerate(distributed_dataframes):
         raw_df = raw_df.copy()
         columns = raw_df.columns
-        cat_cols =[cat_col for cat_col in columns if cat_col in categorical_features and cat_col not in ignore_categorical]
-        
+        cat_cols = [
+            cat_col for cat_col in columns if cat_col in categorical_features and cat_col not in ignore_categorical]
+
         label_encoders = {}
         for cat_col in cat_cols:
             label_encoders[cat_col] = LabelEncoder()
-            raw_df[cat_col] = label_encoders[cat_col].fit_transform(raw_df[cat_col])
+            raw_df[cat_col] = label_encoders[cat_col].fit_transform(
+                raw_df[cat_col])
 
-        dataset = TabularDataset(data=raw_df, cat_cols=cat_cols, is_client=True)
+        dataset = TabularDataset(
+            data=raw_df, cat_cols=cat_cols, is_client=True)
 
-        # Using complete_df here bacause we must set emb layer for all types of a feature.     
+        # Using complete_df here bacause we must set emb layer for all types of a feature.
         cat_dims = [int(complete_df[col].nunique()) for col in cat_cols]
         emb_dims = [(x, min(50, (x + 1) // 2)) for x in cat_dims]
 
         cont_columns = [column for column in columns if column not in cat_cols]
-
 
         if(server_nn_type == 'stack'):
             ln_dim = len(columns) * ln_upscale_ce
@@ -403,16 +394,20 @@ if __name__ == "__main__":
             ln_dim = len(df.columns)
 
         model = FeedForwardNN(emb_dims, no_of_cont=len(cont_columns), lin_layer_sizes=np.repeat(ln_dim, num_linear_layers),
-                            output_size=n_output_classes, emb_dropout=0.04,
-                            lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
-        dataloader = DataLoader(dataset, batchsize, shuffle=False, num_workers=1)
-        iter_dataloader = iter(DataLoader(dataset, batchsize, shuffle=False, num_workers=1))
-        client_optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
-
+                              output_size=n_output_classes, emb_dropout=0.04,
+                              lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
+        dataloader = DataLoader(
+            dataset, batchsize, shuffle=False, num_workers=1)
+        iter_dataloader = iter(DataLoader(
+            dataset, batchsize, shuffle=False, num_workers=1))
+        client_optimizer = torch.optim.AdamW(
+            model.parameters(), lr=args.lr, weight_decay=args.wd)
 
         client_test_data = df_test[list(raw_df.columns)]
-        client_test_dataset = TabularDataset(data=client_test_data, cat_cols=cat_cols, is_client=True)
-        client_test_dataloader = DataLoader(client_test_dataset, batchsize, shuffle=False, num_workers=1)
+        client_test_dataset = TabularDataset(
+            data=client_test_data, cat_cols=cat_cols, is_client=True)
+        client_test_dataloader = DataLoader(
+            client_test_dataset, batchsize, shuffle=False, num_workers=1)
 
         clients['client_' + str(i)] = {
             'raw_df': raw_df,
@@ -430,13 +425,12 @@ if __name__ == "__main__":
             'activation': None
         }
 
-
     # Test data prerequisits
 
     test_dataset = TabularDataset(data=df_test, cat_cols=categorical_features,
-                                output_col=output_feature)
-    test_dataloader = DataLoader(test_dataset, batchsize, shuffle=False, num_workers=1)
-
+                                  output_col=output_feature)
+    test_dataloader = DataLoader(
+        test_dataset, batchsize, shuffle=False, num_workers=1)
 
     # Intialize central server model
     ln_size = 0
@@ -449,40 +443,57 @@ if __name__ == "__main__":
     # ln_size = num_clients * 100
     if(server_nn_type == 'stack'):
         server_model = ServerFeedForwardNN(input_size=n_features, lin_layer_sizes=np.repeat(ln_size, num_linear_layers),
-                                output_size=n_output_classes, emb_dropout=0.04,
-                                lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
+                                           output_size=n_output_classes, emb_dropout=0.04,
+                                           lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
     else:
         ln_size = client.get('ln_dim')
         server_model = ServerFeedForwardNN(input_size=n_features, lin_layer_sizes=np.repeat(ln_size, num_linear_layers),
-                            output_size=n_output_classes, emb_dropout=0.001,
-                            lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
-
-
+                                           output_size=n_output_classes, emb_dropout=0.001,
+                                           lin_layer_dropouts=np.repeat(0.001, num_linear_layers), config=config).to(device)
 
     #  Training
     no_of_epochs = args.epochs
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.AdamW(server_model.parameters(), lr=args.lr, weight_decay=args.wd)
-
+    optimizer = torch.optim.AdamW(
+        server_model.parameters(), lr=args.lr, weight_decay=args.wd)
+    # Initialize the index of the hyperparameters file
+    config_index = 0
 
     for epoch in range(no_of_epochs):
-        
-        for batch_pointer in range(math.ceil(n_train_samples/batchsize)):        
+        # Read the hyperparameters from the file
+        hyper = pd.read_csv('./run-configs/SL_ALL_VARIENT_A23.csv')
+        partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, cut_layer, num_ln, agg_type, ln_upscale, random_seed, db_id, config_id = list(hyper.iloc[config_index])
+        config_index += 1
+
+        # Update the args object with the new hyperparameters
+        args.partition_alpha = partition_alpha
+        args.batch_size = int(batch_size)
+        args.lr = lr
+        args.wd = wd
+        args.epochs = int(epochs)
+        args.client_num_in_total = int(client_num_in_total)
+        args.cut_layer = cut_layer
+        args.num_ln = int(num_ln)
+        args.random_seed = int(random_seed)
+        args.agg_type = 'stack' if int(agg_type) == 0 else 'average'
+        args.ln_upscale = int(ln_upscale)
+
+        for batch_pointer in range(math.ceil(n_train_samples/batchsize)):
             activations = []
 
-            for (client_name, client) in clients.items():            
+            for (client_name, client) in clients.items():
                 client_model = client.get('model')
                 dataloader = client.get('dataloader')
 
-                
-                cont_x, cat_x = dataloader.dataset[batch_pointer * batchsize:(batch_pointer +1) * batchsize]
+                cont_x, cat_x = dataloader.dataset[batch_pointer *
+                                                   batchsize:(batch_pointer + 1) * batchsize]
                 client_model.train()
                 client.get('optimizer').zero_grad()
-                
+
                 cat_x = torch.from_numpy(cat_x).to(device)
                 cont_x = torch.from_numpy(cont_x).to(device)
                 activation = client_model(cont_x, cat_x)
-                
+
                 activations.append(activation)
 
             # Combine activations and pass it to the server_model
@@ -491,15 +502,17 @@ if __name__ == "__main__":
             if(server_nn_type == 'stack'):
                 server_inputs = torch.cat(activations, dim=1).detach().clone()
             else:
-                server_inputs = torch.mean(torch.stack(activations), dim=0).detach().clone()
+                server_inputs = torch.mean(torch.stack(
+                    activations), dim=0).detach().clone()
 
             server_inputs = Variable(server_inputs, requires_grad=True)
             outputs = server_model(server_inputs)
 
-            labels = training_labels[batch_pointer * batchsize:(batch_pointer +1) * batchsize]
+            labels = training_labels[batch_pointer *
+                                     batchsize:(batch_pointer + 1) * batchsize]
             labels = labels.to(device)
-            loss = criterion(outputs, labels)            
-            
+            loss = criterion(outputs, labels)
+
             loss.backward()
             optimizer.step()
             prev_pointer = 0
@@ -507,18 +520,28 @@ if __name__ == "__main__":
                 nn_partition = client.get('ln_dim')
 
                 if(server_nn_type == 'stack'):
-                    activation.backward(server_inputs.grad[:,prev_pointer:nn_partition + prev_pointer])
+                    activation.backward(
+                        server_inputs.grad[:, prev_pointer:nn_partition + prev_pointer])
                 else:
                     activation.backward(server_inputs.grad)
                 prev_pointer += nn_partition
                 client.get('optimizer').step()
-        
-                
+
         # print("\r Epoch: {} , Loss {}".format(epoch, loss.item()), end="")
         # Calculate test accuracy after each epoch
         accuracy = check_accuracy(clients, test_dataloader, server_model)
+        # Extract hyperparameters (assuming they're stored in the 'args' object)
+        hyperparameters = {
+            'batch_size': args.batch_size,
+            'cut_layer': args.cut_layer,
+            'partition_alpha': args.partition_alpha,
+            'client_num_in_total': args.client_num_in_total
+        }
 
         wandb.log({"Test/Acc": accuracy, "epoch": epoch})
         wandb.log({"Train/Loss": loss.item(), "epoch": epoch})
         print("Epoch: {}, Accuracy: {} ".format(epoch, accuracy), end="\n")
-        save_accuracy_to_csv(accuracy)
+
+       
+        save_accuracy_to_csv(accuracy, hyperparameters)
+        # save_accuracy_to_csv(accuracy)
