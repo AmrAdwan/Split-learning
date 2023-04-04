@@ -533,9 +533,9 @@ if __name__ == "__main__":
         # Extract hyperparameters (assuming they're stored in the 'args' object)
         hyperparameters = {
             'batch_size': args.batch_size,
+            'client_num_in_total': args.client_num_in_total,
             'cut_layer': args.cut_layer,
-            'partition_alpha': args.partition_alpha,
-            'client_num_in_total': args.client_num_in_total
+            'partition_alpha': args.partition_alpha
         }
 
         wandb.log({"Test/Acc": accuracy, "epoch": epoch})

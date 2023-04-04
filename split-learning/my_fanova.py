@@ -70,7 +70,7 @@ import numpy as np
 
 df_acc = pd.read_csv("./run-configs/accuracy_values.csv")
 
-column_names = ['partition_alpha', 'batch_size', 'cut_layer']
+column_names = ['batch_size','client_num_in_total', 'cut_layer', 'partition_alpha']
 X = df_acc[column_names]
 y = df_acc['accuracy']
 
@@ -87,14 +87,17 @@ batch_size_min = df_acc['batch_size'].min()
 batch_size_max = df_acc['batch_size'].max()
 cut_layer_min = df_acc['cut_layer'].min()
 cut_layer_max = df_acc['cut_layer'].max()
+client_num_in_total_min = df_acc['client_num_in_total'].min()
+client_num_in_total_max = df_acc['client_num_in_total'].max()
 
 partition_alpha = UniformFloatHyperparameter("partition_alpha", pa_min, pa_max, log=True)
 # batch_size = UniformIntegerHyperparameter("batch_size", 8, 128)
 batch_size = UniformIntegerHyperparameter("batch_size", batch_size_min, batch_size_max)
 # client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", 1, 19) 
 cut_layer = UniformIntegerHyperparameter("cut_layer", cut_layer_min, cut_layer_max)
+client_num_in_total = UniformIntegerHyperparameter("client_num_in_total", client_num_in_total_min, client_num_in_total_max)
 
-cs.add_hyperparameters([partition_alpha, batch_size, cut_layer])
+cs.add_hyperparameters([batch_size, client_num_in_total, cut_layer, partition_alpha])
 
 # f = fANOVA(X_train.to_numpy(), y_train.to_numpy(), config_space=cs)
 
