@@ -1,0 +1,42 @@
+{
+    "os": "Darwin-22.4.0-x86_64-i386-64bit",
+    "python": "3.7.6",
+    "heartbeatAt": "2023-04-05T08:23:51.359359",
+    "startedAt": "2023-04-05T08:23:50.655634",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "Split-NN-Benchmark.py",
+    "codePath": "split-learning/Split-NN-Benchmark.py",
+    "git": {
+        "remote": "git@github.com:AmrAdwan/fed_benchmarks.git",
+        "commit": "e90d1d2f3f551e45dda49dda9dfa395832a89e41"
+    },
+    "email": "a.adwan@umail.leidenuniv.nl",
+    "root": "/Users/amradwan/Desktop/uni/3ejaar/3de jaar 1e semester/bachelor_project/fed_benchmarks",
+    "host": "MacBook-Pro-van-Amr.local",
+    "username": "amradwan",
+    "executable": "/Library/Frameworks/Python.framework/Versions/3.7/bin/python3.7",
+    "cpu_count": 2,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 3100,
+        "min": 3100,
+        "max": 3100
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3100,
+            "min": 3100,
+            "max": 3100
+        }
+    ],
+    "disk": {
+        "total": 465.62699127197266,
+        "used": 8.452411651611328
+    },
+    "memory": {
+        "total": 8.0
+    }
+}

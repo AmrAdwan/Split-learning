@@ -68,7 +68,7 @@ import numpy as np
 
 
 
-df_acc = pd.read_csv("./run-configs/accuracy_values.csv")
+df_acc = pd.read_csv("./run-configs/accuracy_values2.csv")
 
 column_names = ['batch_size','client_num_in_total', 'cut_layer', 'partition_alpha']
 X = df_acc[column_names]

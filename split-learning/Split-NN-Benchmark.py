@@ -63,9 +63,27 @@ from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparamete
 #     # Save the DataFrame to the CSV file
 #     combined_data.to_csv(file_path, index=False)
 
-def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values.csv"):
+# def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values2.csv"):
+#     # Add column names if file is empty
+#     if os.path.isfile(csv_file) and os.path.getsize(csv_file) == 0:
+#         with open(csv_file, mode="a", newline="") as file:
+#             writer = csv.writer(file)
+#             writer.writerow(list(hyperparameters.keys()) + ['accuracy'])
+
+#     # Append accuracy and hyperparameters to CSV file
+#     with open(csv_file, mode="a", newline="") as file:
+#         writer = csv.writer(file)
+#         writer.writerow( [hyperparameters[key] for key in sorted(hyperparameters)] + [accuracy])
+
+
+def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values2.csv"):
+    # Create file if it does not exist
+    if not os.path.isfile(csv_file):
+        with open(csv_file, mode="w", newline="") as file:
+            pass
+    
     # Add column names if file is empty
-    if os.path.isfile(csv_file) and os.path.getsize(csv_file) == 0:
+    if os.path.getsize(csv_file) == 0:
         with open(csv_file, mode="a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(list(hyperparameters.keys()) + ['accuracy'])
@@ -74,7 +92,6 @@ def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accu
     with open(csv_file, mode="a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow( [hyperparameters[key] for key in sorted(hyperparameters)] + [accuracy])
-
 
 
 # num_features, datasetid
@@ -186,7 +203,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # # Read config file and append configs to args parser
-    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A23.csv')
+    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A22.csv')
     # df = pd.read_csv('./run-configs/small_batch_split_nn_all_runs_config.csv')
 
     partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, cut_layer, num_ln, agg_type, ln_upscale, random_seed, db_id, config_id = list(
