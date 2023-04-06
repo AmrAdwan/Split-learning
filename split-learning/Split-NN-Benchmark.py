@@ -96,16 +96,16 @@ def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accu
 
 # num_features, datasetid
 cc18 = [
-    # (82, 40966),
-    # (20, 40984),
+    (82, 40966),
+    (20, 40984),
     (1777, 4134),
-    # (1559, 40978),
-    # (618, 300),
+    (1559, 40978),
+    (618, 300),
     (562, 1478),
-    # (181, 40670),
+    (181, 40670),
     (119, 1486),
     (82, 40966),
-    # (73, 1487),
+    (73, 1487),
     (65, 28),
     (62, 46)
 ]
@@ -224,7 +224,8 @@ if __name__ == "__main__":
     args.ln_upscale = int(ln_upscale)
 
     args.desc = 'All varient. nLn fixed. Aggregation check. 1 datasets (200 runs). Seed is fixed.'
-    args.dataset_index_id = int(db_id)
+    # args.dataset_index_id = int(db_id)
+    args.dataset_index_id = 0
     dataset_index_id = args.dataset_index_id
     (_, dataset_id) = cc18[dataset_index_id]
     args.dataset_id = dataset_id
