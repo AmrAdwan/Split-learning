@@ -16,7 +16,7 @@ column_names = ['batch_size','client_num_in_total', 'cut_layer', 'partition_alph
 X = df_acc[column_names]
 y = df_acc['accuracy']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=70)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 scaler = MinMaxScaler()
 y_train_normalized = scaler.fit_transform(y_train.to_numpy().reshape(-1, 1)).reshape(-1)

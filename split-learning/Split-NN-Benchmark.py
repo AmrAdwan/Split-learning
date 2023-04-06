@@ -76,7 +76,7 @@ from ConfigSpace.hyperparameters import Hyperparameter, CategoricalHyperparamete
 #         writer.writerow( [hyperparameters[key] for key in sorted(hyperparameters)] + [accuracy])
 
 
-def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values2.csv"):
+def save_accuracy_to_csv(accuracy, hyperparameters, csv_file="./run-configs/accuracy_values.csv"):
     # Create file if it does not exist
     if not os.path.isfile(csv_file):
         with open(csv_file, mode="w", newline="") as file:
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # # Read config file and append configs to args parser
-    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A22.csv')
+    df = pd.read_csv('./run-configs/SL_ALL_VARIENT_A23.csv')
     # df = pd.read_csv('./run-configs/small_batch_split_nn_all_runs_config.csv')
 
     partition_alpha, batch_size, lr, wd, epochs, client_num_in_total, cut_layer, num_ln, agg_type, ln_upscale, random_seed, db_id, config_id = list(
@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
     args.desc = 'All varient. nLn fixed. Aggregation check. 1 datasets (200 runs). Seed is fixed.'
     # args.dataset_index_id = int(db_id)
-    args.dataset_index_id = 0
+    args.dataset_index_id = 1
     dataset_index_id = args.dataset_index_id
     (_, dataset_id) = cc18[dataset_index_id]
     args.dataset_id = dataset_id
